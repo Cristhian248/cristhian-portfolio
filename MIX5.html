@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRISTEC - Cotizador Integrado</title>
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-cyan: #00f0ff;
+      --accent-blue: #2563eb;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(37, 99, 235, 0.1) 0%, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 12px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 240, 255, 0.08);
+    }
+
+    /* Header Marca */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .brand-logo {
+      font-size: 2.5rem;
+      font-weight: 900;
+      letter-spacing: 5px;
+      color: #ffffff;
+      text-transform: uppercase;
+      margin: 0;
+      text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+    }
+
+    .brand-logo span {
+      color: var(--accent-cyan);
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      letter-spacing: 5px;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      margin-top: 4px;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    /* Navegación y Vistas */
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--accent-cyan);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-back:hover {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--accent-cyan);
+    }
+
+    .view-screen {
+      display: block;
+    }
+
+    .view-screen.hidden {
+      display: none;
+    }
+
+    /* Tarjetas del Menú Principal */
+    .menu-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    .main-menu-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 500px) {
+      .main-menu-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .menu-card {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .menu-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0, 240, 255, 0.2);
+      background: rgba(30, 41, 59, 0.8);
+    }
+
+    .menu-card .menu-icon {
+      font-size: 3rem;
+      margin-bottom: 6px;
+    }
+
+    .menu-card h3 {
+      color: #fff;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+
+    .menu-card p {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    /* Secciones Estándar */
+    .section-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-cyan);
+      margin-bottom: 14px;
+      font-weight: 700;
+    }
+
+    .step-block {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .step-block.center-header .section-title {
+      text-align: center;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .option-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .option-card:hover {
+      border-color: rgba(0, 240, 255, 0.5);
+      transform: translateY(-2px);
+      color: var(--text-main);
+      box-shadow: 0 4px 15px rgba(0, 240, 255, 0.15);
+    }
+
+    .option-card.active {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 240, 255, 0.1);
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+    }
+
+    .option-card .icon-label {
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .option-card .title-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    /* Selector de color */
+    .color-selector {
+      display: flex;
+      gap: 12px;
+      margin-top: 14px;
+      justify-content: center;
+    }
+
+    .color-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .color-btn.active {
+      border-color: var(--accent-cyan);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+    }
+
+    .color-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .color-dot.black { background: #111; }
+    .color-dot.white { background: #fff; }
+
+    /* ESTUDIO DEL PRODUCTO AUTOMATIZACIÓN */
+    .product-stage {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      border-radius: 16px;
+      background: radial-gradient(circle at center, rgba(30, 41, 59, 0.8) 0%, rgba(10, 15, 26, 0.95) 75%);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.9), 0 10px 30px rgba(0,0,0,0.5);
+      overflow: hidden;
+      padding: 20px;
+      margin: 0 auto;
+    }
+
+    .switch-product {
+      width: 110px;
+      height: 185px;
+      border-radius: 12px;
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .rings-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex: 1;
+      width: 100%;
+    }
+
+    .switch-product.black-glass {
+      background: linear-gradient(145deg, #232a36 0%, #0c0f17 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 
+        0 25px 45px rgba(0, 0, 0, 0.85),
+        0 0 25px rgba(0, 240, 255, 0.25),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .switch-product.white-glass {
+      background: linear-gradient(145deg, #ffffff 0%, #e2e8f0 100%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 
+        0 25px 45px rgba(0, 0, 0, 0.65),
+        0 0 20px rgba(255, 255, 255, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 1);
+    }
+
+    .wifi-icon {
+      width: 16px;
+      height: 14px;
+      fill: #00f0ff;
+      filter: drop-shadow(0 0 4px #00f0ff);
+    }
+
+    .switch-product.white-glass .wifi-icon {
+      fill: #0284c7;
+      filter: drop-shadow(0 0 3px #0284c7);
+    }
+
+    .touch-ring {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid #00f0ff;
+      box-shadow: 0 0 10px #00f0ff, inset 0 0 5px #00f0ff;
+      transition: all 0.3s ease;
+      animation: pulseLed 2.5s infinite ease-in-out;
+    }
+
+    .switch-product.white-glass .touch-ring {
+      border-color: #0284c7;
+      box-shadow: 0 0 8px #0284c7, inset 0 0 4px #0284c7;
+    }
+
+    @keyframes pulseLed {
+      0%, 100% { opacity: 0.75; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .ac-controller-render {
+      width: 135px;
+      height: 135px;
+      background: linear-gradient(145deg, #2b2e34 0%, #17181c 100%);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.8),
+        0 0 15px rgba(0, 240, 255, 0.15);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.4s ease;
+    }
+
+    .ac-power-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    }
+
+    .ac-power-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: #ffffff;
+    }
+
+    .ac-wifi-icon {
+      position: absolute;
+      bottom: 14px;
+      left: 14px;
+      width: 14px;
+      height: 14px;
+      fill: #00f0ff;
+      filter: drop-shadow(0 0 4px #00f0ff);
+    }
+
+    .stage-label {
+      position: absolute;
+      bottom: 10px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* RENDER DE PLACA ELÉCTRICA */
+    .mech-plate {
+      width: 140px;
+      height: 220px;
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      transition: all 0.3s ease;
+      margin: auto;
+    }
+
+    .mech-plate.white-plate {
+      background: linear-gradient(145deg, #ffffff 0%, #e2e8f0 100%);
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,1);
+    }
+
+    .mech-plate.black-plate {
+      background: linear-gradient(145deg, #2a3241 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.1);
+    }
+
+    .mech-frame {
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .white-plate .mech-frame {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+    }
+
+    .black-plate .mech-frame {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+    }
+
+    .module-slot {
+      flex: 1;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .mod-switch {
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .white-plate .mod-switch {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      border: 1px solid #cbd5e1;
+    }
+
+    .black-plate .mod-switch {
+      background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+      border: 1px solid #475569;
+    }
+
+    .mod-switch-indicator {
+      width: 3px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .white-plate .mod-switch-indicator { background: #cbd5e1; }
+    .black-plate .mod-switch-indicator { background: #64748b; }
+
+    .mod-socket {
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .white-plate .mod-socket {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+    }
+
+    .black-plate .mod-socket {
+      background: #1e293b;
+      border: 1px solid #334155;
+    }
+
+    .socket-holes {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .hole-pin {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .white-plate .hole-pin { background: #334155; }
+    .black-plate .hole-pin { background: #020617; }
+
+    .hole-ground {
+      width: 4px;
+      height: 8px;
+      border-radius: 2px;
+    }
+
+    .white-plate .hole-ground { background: #334155; }
+    .black-plate .hole-ground { background: #020617; }
+
+    .mod-blank {
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+      opacity: 0.6;
+    }
+
+    .white-plate .mod-blank {
+      background: #f8fafc;
+      border: 1px dashed #e2e8f0;
+    }
+
+    .black-plate .mod-blank {
+      background: #0f172a;
+      border: 1px dashed #1e293b;
+    }
+
+    .stage-badges {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      width: max-content;
+      max-width: 90%;
+    }
+
+    .stage-badge {
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--accent-cyan);
+      border-radius: 12px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+      font-size: 0.8rem;
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .stage-badge .highlight {
+      color: var(--accent-cyan);
+      font-weight: bold;
+    }
+
+    /* Contadores y Camppo Editable */
+    .counter-control {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .counter-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--accent-cyan);
+      background: rgba(0, 240, 255, 0.1);
+      color: var(--accent-cyan);
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .counter-btn:hover {
+      background: var(--accent-cyan);
+      color: #000;
+    }
+
+    .counter-num-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+
+    .counter-num {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #fff;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .counter-input {
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      font-size: 1.1rem;
+      font-weight: bold;
+      width: 65px;
+      text-align: center;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+
+    .counter-input::-webkit-outer-spin-button,
+    .counter-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .counter-unit {
+      font-size: 0.8rem;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    /* Resumen */
+    .summary-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid var(--card-border);
+      border-left: 4px solid var(--accent-cyan);
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 20px;
+    }
+
+    .summary-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-cyan);
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+
+    .summary-item span.val {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Botón WhatsApp */
+    .btn-whatsapp {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      margin-top: 20px;
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.35);
+      transition: all 0.25s ease;
+      text-decoration: none;
+    }
+
+    .btn-whatsapp:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(37, 211, 102, 0.5);
+    }
+
+    /* Estilos de Íconos SVG para Wi-Fi */
+    .wifi-signal-icon {
+      width: 32px;
+      height: 32px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header General -->
+  <div class="brand-header">
+    <h1 class="brand-logo">CRIS<span>TEC</span></h1>
+    <div class="brand-sub">Tecnologías e Innovación</div>
+  </div>
+
+  <!-- VISTA 1: MENÚ PRINCIPAL -->
+  <div id="view-menu" class="view-screen">
+    <p class="menu-subtitle">Selecciona el tipo de servicio que deseas cotizar:</p>
+    
+    <div class="main-menu-grid">
+      <div class="menu-card" onclick="openView('electrica')">
+        <div class="menu-icon">⚡</div>
+        <h3>Instalación Eléctrica</h3>
+        <p>Cotiza placas tradicionales, llaves, tomas y metros de cableado.</p>
+      </div>
+
+      <div class="menu-card" onclick="openView('automatizacion')">
+        <div class="menu-icon">🤖</div>
+        <h3>Domótica / Automatización</h3>
+        <p>Interruptores táctiles de cristal, control de AC / IR y asistentes de voz.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISTA 2: COTIZADOR ELÉCTRICO -->
+  <div id="view-electrica" class="view-screen hidden">
+    <button class="btn-back" onclick="openView('menu')">← Volver al Menú</button>
+
+    <!-- Paso 1: Datos Generales -->
+    <div class="step-block">
+      <div class="section-title">1. Datos del Proyecto</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+          <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Habitaciones</div>
+          <div class="counter-control">
+            <button class="counter-btn" onclick="changeHabitacionesElec(-1)">-</button>
+            <div class="counter-num-box">
+              <span class="counter-num" id="hab-qty-elec">1</span>
+            </div>
+            <button class="counter-btn" onclick="changeHabitacionesElec(1)">+</button>
+          </div>
+        </div>
+        <div>
+          <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Puntos Totales</div>
+          <div class="counter-control">
+            <button class="counter-btn" onclick="changePuntosTotalesElec(-1)">-</button>
+            <div class="counter-num-box">
+              <span class="counter-num" id="puntos-totales-qty-elec">1</span>
+            </div>
+            <button class="counter-btn" onclick="changePuntosTotalesElec(1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 2: Selección de Elementos -->
+    <div class="step-block">
+      <div class="section-title">2. Elementos a Requerir</div>
+
+      <div class="options-grid" id="tipo-grid-elec">
+        <div class="option-card active" onclick="selectTipoElec('Interruptores', this)">
+          <span class="icon-label">💡</span>
+          <div class="title-label">Puntos de Luz (Interruptores)</div>
+        </div>
+        <div class="option-card" onclick="selectTipoElec('Enchufes', this)">
+          <span class="icon-label">🔌</span>
+          <div class="title-label">Enchufes</div>
+        </div>
+        <div class="option-card" onclick="selectTipoElec('Ambos', this)">
+          <span class="icon-label">⚡</span>
+          <div class="title-label">Ambos (Luz + Enchufe)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 3: Selección de Puntos por Placa -->
+    <div class="step-block">
+      <div class="section-title">3. Configuración de Placa (Módulos por Placa)</div>
+      
+      <div class="options-grid" id="puntos-grid-elec">
+        <div class="option-card active" onclick="selectPuntoElec(1, this)">
+          <span class="icon-label" id="icon-punto-1-elec">💡</span>
+          <div class="title-label" id="lbl-punto-1-elec">1 Punto</div>
+        </div>
+        <div class="option-card" onclick="selectPuntoElec(2, this)">
+          <span class="icon-label" id="icon-punto-2-elec">💡</span>
+          <div class="title-label" id="lbl-punto-2-elec">2 Puntos</div>
+        </div>
+        <div class="option-card" onclick="selectPuntoElec(3, this)">
+          <span class="icon-label" id="icon-punto-3-elec">💡</span>
+          <div class="title-label" id="lbl-punto-3-elec">3 Puntos</div>
+        </div>
+      </div>
+
+      <div class="color-selector">
+        <div class="color-btn active" id="btn-color-white-elec" onclick="selectColorElec('white')">
+          <span class="color-dot white"></span> Blanco
+        </div>
+        <div class="color-btn" id="btn-color-black-elec" onclick="selectColorElec('black')">
+          <span class="color-dot black"></span> Negro
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 4: Cableado -->
+    <div class="step-block">
+      <div class="section-title">4. Cableado Eléctrico</div>
+
+      <div class="options-grid">
+        <div class="option-card" id="card-cableado-elec" onclick="toggleCableadoElec()">
+          <span class="icon-label">🔌</span>
+          <div class="title-label">Incluir Cableado</div>
+        </div>
+      </div>
+
+      <div id="cableado-count-section-elec" style="display: none; margin-top: 15px;">
+        <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+          Ingresa la cantidad exacta de metros requerida:
+        </div>
+        <div class="counter-control">
+          <button class="counter-btn" onclick="changeMetrosElec(-5)">-5</button>
+          <button class="counter-btn" onclick="changeMetrosElec(-1)">-1</button>
+          <div class="counter-num-box">
+            <input type="number" class="counter-input" id="metros-qty-elec" value="10" min="1" oninput="inputMetrosElec(this.value)" onchange="validateMetrosElec(this)">
+            <span class="counter-unit">METROS</span>
+          </div>
+          <button class="counter-btn" onclick="changeMetrosElec(1)">+1</button>
+          <button class="counter-btn" onclick="changeMetrosElec(5)">+5</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-block center-header">
+      <div class="section-title">Vista de Referencia</div>
+
+      <div class="product-stage">
+        <div class="mech-plate white-plate" id="plate-render-elec">
+          <div class="mech-frame" id="plate-frame-elec"></div>
+        </div>
+
+        <div class="stage-badges">
+          <div class="stage-badge" id="badge-cableado-elec" style="display: none;">
+            <span>⚡ Cableado:</span>
+            <span class="highlight" id="badge-metros-val-elec">10 METROS</span>
+          </div>
+          <div class="stage-badge" id="badge-tipo-elec">
+            <span>Modo:</span>
+            <span class="highlight" id="badge-tipo-val-elec">Interruptores</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-title">Resumen de Cotización Eléctrica</div>
+      <div class="summary-item">
+        <span>Habitaciones:</span>
+        <span class="val" id="resumen-hab-elec">1</span>
+      </div>
+      <div class="summary-item">
+        <span>Puntos Totales:</span>
+        <span class="val" id="resumen-puntos-totales-elec">1</span>
+      </div>
+      <div class="summary-item">
+        <span>Tipo de Elemento:</span>
+        <span class="val" id="resumen-tipo-elec">Puntos de Luz (💡)</span>
+      </div>
+      <div class="summary-item">
+        <span>Placa / Módulos:</span>
+        <span class="val" id="resumen-switch-elec">1 Punto (Blanco)</span>
+      </div>
+      <div class="summary-item">
+        <span>Cableado Requerido:</span>
+        <span class="val" id="resumen-cableado-elec">No incluido</span>
+      </div>
+    </div>
+
+    <button class="btn-whatsapp" onclick="sendWhatsAppElec()">
+      <span>💬 Solicitar Cotización Eléctrica</span>
+    </button>
+  </div>
+
+  <!-- VISTA 3: AUTOMATIZACIÓN -->
+  <div id="view-automatizacion" class="view-screen hidden">
+    <button class="btn-back" onclick="openView('menu')">← Volver al Menú</button>
+
+    <!-- Paso 1: Datos Generales -->
+    <div class="step-block">
+      <div class="section-title">1. Datos del Proyecto</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+          <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Habitaciones</div>
+          <div class="counter-control">
+            <button class="counter-btn" onclick="changeHabitacionesAuto(-1)">-</button>
+            <div class="counter-num-box">
+              <span class="counter-num" id="hab-qty-auto">1</span>
+            </div>
+            <button class="counter-btn" onclick="changeHabitacionesAuto(1)">+</button>
+          </div>
+        </div>
+        <div>
+          <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px;">Puntos Totales</div>
+          <div class="counter-control">
+            <button class="counter-btn" onclick="changePuntosTotalesAuto(-1)">-</button>
+            <div class="counter-num-box">
+              <span class="counter-num" id="puntos-totales-qty-auto">1</span>
+            </div>
+            <button class="counter-btn" onclick="changePuntosTotalesAuto(1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 2: Interruptores Táctiles Wi-Fi -->
+    <div class="step-block">
+      <div class="section-title">2. Interruptores Táctiles de Cristal</div>
+      
+      <div class="options-grid" id="puntos-grid-auto">
+        <!-- 1 Punto - 1 Barra Wi-Fi -->
+        <div class="option-card active" onclick="selectPuntoAuto(1, this)">
+          <span class="icon-label">
+            <svg class="wifi-signal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+              <path d="M8.5 15.5a5 5 0 0 1 7 0" />
+              <path d="M5 12a10 10 0 0 1 14 0" opacity="0.25"/>
+            </svg>
+          </span>
+          <div class="title-label">1 Punto</div>
+        </div>
+
+        <!-- 2 Puntos - 2 Barras Wi-Fi -->
+        <div class="option-card" onclick="selectPuntoAuto(2, this)">
+          <span class="icon-label">
+            <svg class="wifi-signal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+              <path d="M8.5 15.5a5 5 0 0 1 7 0" />
+              <path d="M5 12a10 10 0 0 1 14 0" />
+              <path d="M2 8.5a15 15 0 0 1 20 0" opacity="0.25"/>
+            </svg>
+          </span>
+          <div class="title-label">2 Puntos</div>
+        </div>
+
+        <!-- 3 Puntos - 3 Barras Wi-Fi -->
+        <div class="option-card" onclick="selectPuntoAuto(3, this)">
+          <span class="icon-label">
+            <svg class="wifi-signal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+              <path d="M8.5 15.5a5 5 0 0 1 7 0" />
+              <path d="M5 12a10 10 0 0 1 14 0" />
+              <path d="M2 8.5a15 15 0 0 1 20 0" />
+            </svg>
+          </span>
+          <div class="title-label">3 Puntos</div>
+        </div>
+      </div>
+
+      <!-- Color -->
+      <div class="color-selector">
+        <div class="color-btn active" id="btn-color-black-auto" onclick="selectColorAuto('black')">
+          <span class="color-dot black"></span> Negro Cristal
+        </div>
+        <div class="color-btn" id="btn-color-white-auto" onclick="selectColorAuto('white')">
+          <span class="color-dot white"></span> Blanco Cristal
+        </div>
+      </div>
+    </div>
+
+    <!-- Paso 3: Control de Aire / IR -->
+    <div class="step-block">
+      <div class="section-title">3. Control de Aire Acondicionado / IR</div>
+
+      <div class="options-grid">
+        <div class="option-card" id="card-ac-auto" onclick="toggleACAuto()">
+          <span class="icon-label">❄️</span>
+          <div class="title-label">Control Smart AC / IR</div>
+        </div>
+      </div>
+
+      <div id="ac-count-section-auto" style="display: none; margin-top: 15px;">
+        <div style="text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+          Cantidad de Equipos de AC a Automatizar:
+        </div>
+        <div class="counter-control">
+          <button class="counter-btn" onclick="changeACCountAuto(-1)">-</button>
+          <div class="counter-num-box">
+            <span class="counter-num" id="ac-qty-auto">1</span>
+          </div>
+          <button class="counter-btn" onclick="changeACCountAuto(1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Muestra de Producto -->
+    <div class="step-block">
+      <div class="section-title">Vista de Producto</div>
+
+      <div class="product-stage">
+        <div class="switch-product black-glass" id="switch-render-auto">
+          <svg class="wifi-icon" viewBox="0 0 24 24">
+            <path d="M12 3c-4.97 0-9.47 2.01-12.73 5.27l2.12 2.12c2.72-2.72 6.47-4.39 10.61-4.39 4.14 0 7.89 1.67 10.61 4.39l2.12-2.12c-3.26-3.26-7.76-5.27-12.73-5.27zm0 6c-3.31 0-6.31 1.34-8.49 3.51l2.12 2.12c1.63-1.63 3.88-2.63 6.37-2.63 2.49 0 4.74 1 6.37 2.63l2.12-2.12c-2.18-2.17-5.18-3.51-8.49-3.51zm0 6c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+
+          <div class="rings-wrapper" id="rings-container-auto">
+            <div class="touch-ring"></div>
+          </div>
+        </div>
+
+        <div class="ac-controller-render" id="ac-render-auto" style="display: none;">
+          <div class="ac-power-btn">
+            <svg viewBox="0 0 24 24">
+              <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+            </svg>
+          </div>
+          <svg class="ac-wifi-icon" viewBox="0 0 24 24">
+            <path d="M12 3c-4.97 0-9.47 2.01-12.73 5.27l2.12 2.12c2.72-2.72 6.47-4.39 10.61-4.39 4.14 0 7.89 1.67 10.61 4.39l2.12-2.12c-3.26-3.26-7.76-5.27-12.73-5.27zm0 6c-3.31 0-6.31 1.34-8.49 3.51l2.12 2.12c1.63-1.63 3.88-2.63 6.37-2.63 2.49 0 4.74 1 6.37 2.63l2.12-2.12c-2.18-2.17-5.18-3.51-8.49-3.51zm0 6c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+        </div>
+
+        <div class="stage-label" id="stage-caption-auto">Placa Táctil Wi-Fi</div>
+      </div>
+    </div>
+
+    <!-- Paso 4: Asistentes de Voz -->
+    <div class="step-block">
+      <div class="section-title">4. Ecosistema y Control</div>
+
+      <div class="options-grid">
+        <div class="option-card" onclick="togglePlatformAuto(this, 'Amazon Alexa')">
+          <span class="icon-label">🗣️</span>
+          <div class="title-label">Alexa</div>
+        </div>
+        <div class="option-card" onclick="togglePlatformAuto(this, 'Google Home')">
+          <span class="icon-label">🔊</span>
+          <div class="title-label">Google Home</div>
+        </div>
+        <div class="option-card" onclick="togglePlatformAuto(this, 'App Móvil')">
+          <span class="icon-label">📱</span>
+          <div class="title-label">App Móvil</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen Automatización -->
+    <div class="summary-card">
+      <div class="summary-title">Resumen de Cotización</div>
+      <div class="summary-item">
+        <span>Habitaciones:</span>
+        <span class="val" id="resumen-hab-auto">1</span>
+      </div>
+      <div class="summary-item">
+        <span>Puntos Totales:</span>
+        <span class="val" id="resumen-puntos-totales-auto">1</span>
+      </div>
+      <div class="summary-item">
+        <span>Interruptor Smart:</span>
+        <span class="val" id="resumen-switch-auto">1 Punto (Negro Cristal)</span>
+      </div>
+      <div class="summary-item">
+        <span>Control de AC / IR:</span>
+        <span class="val" id="resumen-ac-auto">No incluido</span>
+      </div>
+      <div class="summary-item">
+        <span>Integración:</span>
+        <span class="val" id="resumen-plataforma-auto">Ninguno</span>
+      </div>
+    </div>
+
+    <!-- Botón WhatsApp Automatización -->
+    <button class="btn-whatsapp" onclick="sendWhatsAppAuto()">
+      <span>💬 Solicitar Cotización por WhatsApp</span>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  // Control de Navegación de Vistas
+  function openView(viewName) {
+    document.querySelectorAll('.view-screen').forEach(el => el.classList.add('hidden'));
+    document.getElementById(`view-${viewName}`).classList.remove('hidden');
+  }
+
+  // ==========================================
+  // 1. LÓGICA COTIZADOR ELÉCTRICO
+  // ==========================================
+  let configElec = {
+    habitaciones: 1,
+    puntosTotales: 1,
+    puntos: 1,
+    color: 'white',
+    cableadoEnabled: false,
+    cableadoMetros: 10,
+    tipoInstalacion: 'Interruptores'
+  };
+
+  function changeHabitacionesElec(delta) {
+    configElec.habitaciones = Math.max(1, configElec.habitaciones + delta);
+    document.getElementById('hab-qty-elec').innerText = configElec.habitaciones;
+    updateUIElec();
+  }
+
+  function changePuntosTotalesElec(delta) {
+    configElec.puntosTotales = Math.max(1, configElec.puntosTotales + delta);
+    document.getElementById('puntos-totales-qty-elec').innerText = configElec.puntosTotales;
+    updateUIElec();
+  }
+
+  function selectPuntoElec(puntos, cardElem) {
+    configElec.puntos = puntos;
+    document.querySelectorAll('#puntos-grid-elec .option-card').forEach(c => c.classList.remove('active'));
+    cardElem.classList.add('active');
+    updateUIElec();
+  }
+
+  function selectColorElec(color) {
+    configElec.color = color;
+    document.getElementById('btn-color-black-elec').classList.toggle('active', color === 'black');
+    document.getElementById('btn-color-white-elec').classList.toggle('active', color === 'white');
+    updateUIElec();
+  }
+
+  function toggleCableadoElec() {
+    configElec.cableadoEnabled = !configElec.cableadoEnabled;
+    document.getElementById('card-cableado-elec').classList.toggle('active', configElec.cableadoEnabled);
+    document.getElementById('cableado-count-section-elec').style.display = configElec.cableadoEnabled ? 'block' : 'none';
+    document.getElementById('badge-cableado-elec').style.display = configElec.cableadoEnabled ? 'flex' : 'none';
+    updateUIElec();
+  }
+
+  function changeMetrosElec(delta) {
+    configElec.cableadoMetros = Math.max(1, configElec.cableadoMetros + delta);
+    document.getElementById('metros-qty-elec').value = configElec.cableadoMetros;
+    updateUIElec();
+  }
+
+  function inputMetrosElec(val) {
+    let num = parseInt(val, 10);
+    if (!isNaN(num) && num >= 1) {
+      configElec.cableadoMetros = num;
+      updateUIElec();
+    }
+  }
+
+  function validateMetrosElec(input) {
+    let num = parseInt(input.value, 10);
+    if (isNaN(num) || num < 1) {
+      configElec.cableadoMetros = 1;
+      input.value = 1;
+      updateUIElec();
+    }
+  }
+
+  function selectTipoElec(tipo, cardElem) {
+    configElec.tipoInstalacion = tipo;
+    document.querySelectorAll('#tipo-grid-elec .option-card').forEach(c => c.classList.remove('active'));
+    cardElem.classList.add('active');
+    
+    let icon = '💡';
+    if (tipo === 'Enchufes') icon = '🔌';
+    if (tipo === 'Ambos') icon = '⚡';
+
+    document.getElementById('icon-punto-1-elec').innerText = icon;
+    document.getElementById('icon-punto-2-elec').innerText = icon;
+    document.getElementById('icon-punto-3-elec').innerText = icon;
+
+    if (tipo === 'Enchufes') {
+      document.getElementById('lbl-punto-1-elec').innerText = '1 Enchufe';
+      document.getElementById('lbl-punto-2-elec').innerText = '2 Enchufes';
+      document.getElementById('lbl-punto-3-elec').innerText = '3 Enchufes';
+    } else if (tipo === 'Ambos') {
+      document.getElementById('lbl-punto-1-elec').innerText = '1 Luz + 1 Enchufe';
+      document.getElementById('lbl-punto-2-elec').innerText = '2 Luz + 1 Enchufe';
+      document.getElementById('lbl-punto-3-elec').innerText = '1 Luz + 2 Enchufes';
+    } else {
+      document.getElementById('lbl-punto-1-elec').innerText = '1 Punto';
+      document.getElementById('lbl-punto-2-elec').innerText = '2 Puntos';
+      document.getElementById('lbl-punto-3-elec').innerText = '3 Puntos';
+    }
+
+    updateUIElec();
+  }
+
+  function renderModuleHTML(type) {
+    if (type === 'switch') {
+      return `<div class="module-slot mod-switch"><div class="mod-switch-indicator"></div></div>`;
+    } else if (type === 'socket') {
+      return `
+        <div class="module-slot mod-socket">
+          <div class="socket-holes">
+            <div class="hole-pin"></div>
+            <div class="hole-pin"></div>
+          </div>
+          <div class="hole-ground"></div>
+        </div>`;
+    } else {
+      return `<div class="module-slot mod-blank"></div>`;
+    }
+  }
+
+  function updateUIElec() {
+    const plateRender = document.getElementById('plate-render-elec');
+    const plateFrame = document.getElementById('plate-frame-elec');
+
+    plateRender.className = `mech-plate ${configElec.color}-plate`;
+
+    let slots = ['blank', 'blank', 'blank'];
+
+    if (configElec.tipoInstalacion === 'Interruptores') {
+      if (configElec.puntos === 1) slots = ['blank', 'switch', 'blank'];
+      if (configElec.puntos === 2) slots = ['switch', 'blank', 'switch'];
+      if (configElec.puntos === 3) slots = ['switch', 'switch', 'switch'];
+    } else if (configElec.tipoInstalacion === 'Enchufes') {
+      if (configElec.puntos === 1) slots = ['blank', 'socket', 'blank'];
+      if (configElec.puntos === 2) slots = ['socket', 'blank', 'socket'];
+      if (configElec.puntos === 3) slots = ['socket', 'socket', 'socket'];
+    } else if (configElec.tipoInstalacion === 'Ambos') {
+      if (configElec.puntos === 1) slots = ['switch', 'blank', 'socket'];
+      if (configElec.puntos === 2) slots = ['switch', 'switch', 'socket'];
+      if (configElec.puntos === 3) slots = ['switch', 'socket', 'socket'];
+    }
+
+    plateFrame.innerHTML = slots.map(s => renderModuleHTML(s)).join('');
+
+    document.getElementById('badge-metros-val-elec').innerText = `${configElec.cableadoMetros} METROS`;
+    document.getElementById('badge-tipo-val-elec').innerText = configElec.tipoInstalacion;
+
+    const colorTxt = configElec.color === 'black' ? 'Negro' : 'Blanco';
+    let configTxt = '';
+
+    if (configElec.tipoInstalacion === 'Interruptores') {
+      configTxt = `${configElec.puntos} ${configElec.puntos === 1 ? 'Punto' : 'Puntos'}`;
+    } else if (configElec.tipoInstalacion === 'Enchufes') {
+      configTxt = `${configElec.puntos} ${configElec.puntos === 1 ? 'Enchufe' : 'Enchufes'}`;
+    } else {
+      if (configElec.puntos === 1) configTxt = '1 Luz + 1 Enchufe';
+      if (configElec.puntos === 2) configTxt = '2 Luz + 1 Enchufe';
+      if (configElec.puntos === 3) configTxt = '1 Luz + 2 Enchufes';
+    }
+
+    document.getElementById('resumen-hab-elec').innerText = configElec.habitaciones;
+    document.getElementById('resumen-puntos-totales-elec').innerText = configElec.puntosTotales;
+
+    let tipoLabelIcon = 'Puntos de Luz (💡)';
+    if (configElec.tipoInstalacion === 'Enchufes') tipoLabelIcon = 'Enchufes (🔌)';
+    if (configElec.tipoInstalacion === 'Ambos') tipoLabelIcon = 'Ambos (⚡)';
+
+    document.getElementById('resumen-tipo-elec').innerText = tipoLabelIcon;
+    document.getElementById('resumen-switch-elec').innerText = `${configTxt} (${colorTxt})`;
+
+    if (configElec.cableadoEnabled) {
+      document.getElementById('resumen-cableado-elec').innerText = `${configElec.cableadoMetros} METROS`;
+    } else {
+      document.getElementById('resumen-cableado-elec').innerText = 'No incluido';
+    }
+  }
+
+  function sendWhatsAppElec() {
+    const phone = "595992067705";
+    const colorTxt = configElec.color === 'black' ? 'Negro' : 'Blanco';
+    
+    let configTxt = '';
+    if (configElec.tipoInstalacion === 'Interruptores') {
+      configTxt = `${configElec.puntos} ${configElec.puntos === 1 ? 'Punto' : 'Puntos'}`;
+    } else if (configElec.tipoInstalacion === 'Enchufes') {
+      configTxt = `${configElec.puntos} ${configElec.puntos === 1 ? 'Enchufe' : 'Enchufes'}`;
+    } else {
+      if (configElec.puntos === 1) configTxt = '1 Luz + 1 Enchufe';
+      if (configElec.puntos === 2) configTxt = '2 Luz + 1 Enchufe';
+      if (configElec.puntos === 3) configTxt = '1 Luz + 2 Enchufes';
+    }
+
+    let text = `Hola *CRISTEC*, quisiera solicitar una cotización de instalación eléctrica:\n\n`;
+    text += `🏠 *Habitaciones:* ${configElec.habitaciones}\n`;
+    text += `📍 *Puntos Totales Requeridos:* ${configElec.puntosTotales}\n`;
+    text += `💡 *Tipo de Elementos:* ${configElec.tipoInstalacion}\n`;
+    text += `🔌 *Configuración de Placa:* ${configTxt} - Color ${colorTxt}\n`;
+    
+    if (configElec.cableadoEnabled) {
+      text += `⚡ *Cableado:* ${configElec.cableadoMetros} METROS\n`;
+    } else {
+      text += `⚡ *Cableado:* No requerido\n`;
+    }
+
+    text += `\nQuedo a la espera de su presupuesto. ¡Muchas gracias!`;
+
+    const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  }
+
+
+  // ==========================================
+  // 2. LÓGICA COTIZADOR AUTOMATIZACIÓN
+  // ==========================================
+  let configAuto = {
+    habitaciones: 1,
+    puntosTotales: 1,
+    puntos: 1,
+    color: 'black',
+    acEnabled: false,
+    acQty: 1,
+    plataformas: []
+  };
+
+  function changeHabitacionesAuto(delta) {
+    configAuto.habitaciones = Math.max(1, configAuto.habitaciones + delta);
+    document.getElementById('hab-qty-auto').innerText = configAuto.habitaciones;
+    updateUIAuto();
+  }
+
+  function changePuntosTotalesAuto(delta) {
+    configAuto.puntosTotales = Math.max(1, configAuto.puntosTotales + delta);
+    document.getElementById('puntos-totales-qty-auto').innerText = configAuto.puntosTotales;
+    updateUIAuto();
+  }
+
+  function selectPuntoAuto(puntos, cardElem) {
+    configAuto.puntos = puntos;
+    document.querySelectorAll('#puntos-grid-auto .option-card').forEach(c => c.classList.remove('active'));
+    cardElem.classList.add('active');
+    updateUIAuto();
+  }
+
+  function selectColorAuto(color) {
+    configAuto.color = color;
+    document.getElementById('btn-color-black-auto').classList.toggle('active', color === 'black');
+    document.getElementById('btn-color-white-auto').classList.toggle('active', color === 'white');
+    updateUIAuto();
+  }
+
+  function toggleACAuto() {
+    configAuto.acEnabled = !configAuto.acEnabled;
+    document.getElementById('card-ac-auto').classList.toggle('active', configAuto.acEnabled);
+    document.getElementById('ac-count-section-auto').style.display = configAuto.acEnabled ? 'block' : 'none';
+    updateUIAuto();
+  }
+
+  function changeACCountAuto(delta) {
+    configAuto.acQty = Math.max(1, configAuto.acQty + delta);
+    document.getElementById('ac-qty-auto').innerText = configAuto.acQty;
+    updateUIAuto();
+  }
+
+  function togglePlatformAuto(cardElem, platform) {
+    if (configAuto.plataformas.includes(platform)) {
+      configAuto.plataformas = configAuto.plataformas.filter(p => p !== platform);
+      cardElem.classList.remove('active');
+    } else {
+      configAuto.plataformas.push(platform);
+      cardElem.classList.add('active');
+    }
+    updateUIAuto();
+  }
+
+  function updateUIAuto() {
+    const ringsContainer = document.getElementById('rings-container-auto');
+    ringsContainer.innerHTML = '';
+    for (let i = 0; i < configAuto.puntos; i++) {
+      const ring = document.createElement('div');
+      ring.className = 'touch-ring';
+      ringsContainer.appendChild(ring);
+    }
+
+    const switchRender = document.getElementById('switch-render-auto');
+    if (configAuto.color === 'white') {
+      switchRender.className = 'switch-product white-glass';
+    } else {
+      switchRender.className = 'switch-product black-glass';
+    }
+
+    const acRender = document.getElementById('ac-render-auto');
+    const stageCaption = document.getElementById('stage-caption-auto');
+    if (configAuto.acEnabled) {
+      acRender.style.display = 'flex';
+      stageCaption.innerText = 'Interruptor Wi-Fi + Hub Smart AC IR';
+    } else {
+      acRender.style.display = 'none';
+      stageCaption.innerText = 'Placa Táctil Wi-Fi';
+    }
+
+    document.getElementById('resumen-hab-auto').innerText = configAuto.habitaciones;
+    document.getElementById('resumen-puntos-totales-auto').innerText = configAuto.puntosTotales;
+
+    const colorTxt = configAuto.color === 'black' ? 'Negro Cristal' : 'Blanco Cristal';
+    const puntoTxt = `${configAuto.puntos} ${configAuto.puntos === 1 ? 'Punto' : 'Puntos'}`;
+    document.getElementById('resumen-switch-auto').innerText = `${puntoTxt} (${colorTxt})`;
+
+    if (configAuto.acEnabled) {
+      document.getElementById('resumen-ac-auto').innerText = `${configAuto.acQty} Equipo(s) de AC / Control IR`;
+    } else {
+      document.getElementById('resumen-ac-auto').innerText = 'No incluido';
+    }
+
+    if (configAuto.plataformas.length > 0) {
+      document.getElementById('resumen-plataforma-auto').innerText = configAuto.plataformas.join(', ');
+    } else {
+      document.getElementById('resumen-plataforma-auto').innerText = 'Ninguno';
+    }
+  }
+
+  function sendWhatsAppAuto() {
+    const phone = "595992067705";
+    const colorTxt = configAuto.color === 'black' ? 'Negro Cristal' : 'Blanco Cristal';
+    let text = `Hola *CRISTEC*, quisiera solicitar una cotización de automatización:\n\n`;
+    text += `🏠 *Habitaciones:* ${configAuto.habitaciones}\n`;
+    text += `📍 *Puntos Totales Requeridos:* ${configAuto.puntosTotales}\n`;
+    text += `📶 *Interruptor Táctil Wi-Fi:* ${configAuto.puntos} ${configAuto.puntos === 1 ? 'Punto (1 barra)' : configAuto.puntos === 2 ? 'Puntos (2 barras)' : 'Puntos (3 barras)'} - Panel ${colorTxt}\n`;
+    
+    if (configAuto.acEnabled) {
+      text += `❄️ *Control de Aire Acondicionado / IR:* ${configAuto.acQty} equipo(s)\n`;
+    }
+
+    if (configAuto.plataformas.length > 0) {
+      text += `🗣️ *Ecosistema / Control:* ${configAuto.plataformas.join(', ')}\n`;
+    }
+
+    text += `\nQuedo a la espera de su respuesta. ¡Muchas gracias!`;
+
+    const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  }
+
+  // Inicialización
+  updateUIElec();
+  updateUIAuto();
+</script>
+
+</body>
+</html>
